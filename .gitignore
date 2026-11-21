@@ -1,0 +1,4 @@
+# Never commit filled-in files with real passwords
+unattend.xml
+*.local.*
+secrets/

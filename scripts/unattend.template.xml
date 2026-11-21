@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  WDS Deployment Kit - unattend.xml SABLONU
+  Istifade: bu fayli E:\Deploy\Scripts\unattend.xml adi ile kopyala ve 4 yeri doldur:
+    ADMIN_ADI    -> 2 yerde (LocalAccount/Name ve AutoLogon/Username) EYNI olmalidir
+    ADMIN_SIFRE  -> 2 yerde (LocalAccount ve AutoLogon) EYNI olmalidir
+  Sifrede & < > simvollari ISTIFADE ETME (XML-i pozur).
+  Bu fayli sifre ile birlikde Git-e / e-poctaya QOYMA. Git-de yalniz bu sablon saxlanir.
+-->
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+  <settings pass="oobeSystem">
+
+    <!-- Dil, klaviatura, region -->
+    <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <!-- Klaviatura: EN (US) ; AZ (Latin, klassik) ; RU -->
+      <InputLocale>0409:00000409;042c:0000042c;0419:00000419</InputLocale>
+      <!-- Unicode olmayan proqramlar (1C kimi) ucun kiril -->
+      <SystemLocale>ru-RU</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <!-- Tarix, saat, valyuta formati -->
+      <UserLocale>az-Latn-AZ</UserLocale>
+    </component>
+
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+      <TimeZone>Azerbaijan Standard Time</TimeZone>
+
+      <!-- Ilk acilis (OOBE) ekranlarini kec -->
+      <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
+        <ProtectYourPC>3</ProtectYourPC>
+      </OOBE>
+
+      <!-- Lokal admin hesabi -->
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Name>ADMIN_ADI</Name>
+            <DisplayName>IT Admin</DisplayName>
+            <Group>Administrators</Group>
+            <Password>
+              <Value>ADMIN_SIFRE</Value>
+              <PlainText>true</PlainText>
+            </Password>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+
+      <!-- Yuxaridaki EYNI hesab avtomatik daxil olur ki, FirstLogon.ps1 ozu baslasin.
+           Username ve Password yuxaridaki ile EYNI olmasa: "password incorrect" xetasi. -->
+      <AutoLogon>
+        <Enabled>true</Enabled>
+        <Username>ADMIN_ADI</Username>
+        <LogonCount>3</LogonCount>
+        <Password>
+          <Value>ADMIN_SIFRE</Value>
+          <PlainText>true</PlainText>
+        </Password>
+      </AutoLogon>
+
+      <!-- Ilk girisde post-deploy skripti -->
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <CommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\Deploy\FirstLogon.ps1</CommandLine>
+          <Description>Post-deploy: sifre qaliqlari, restore, dil, PC adi, istifadeci</Description>
+          <RequiresUserInput>true</RequiresUserInput>
+        </SynchronousCommand>
+      </FirstLogonCommands>
+
+    </component>
+  </settings>
+</unattend>
